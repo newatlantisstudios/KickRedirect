@@ -64,7 +64,7 @@
                 const state = urlParams.get('state') || '';
                 
                 // Redirect back to your app with the code
-                window.location.href = `kick-app-auth://oauth/callback?code=${code}&state=${state}`;
+                window.location.href = `com.newatlantisstudios.Kick://oauth/callback?code=${code}&state=${state}`;
                 
                 statusElement.innerHTML = '<p class="success">Authorization successful! Redirecting you back to the app...</p>';
                 console.log('OAuth success: Authorization code received, redirecting to app');
