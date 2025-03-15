@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kick OAuth Callback</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        #params {
+            text-align: left;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Kick OAuth Callback</h1>
+        <div id="status">Processing...</div>
+        <div id="params"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const paramsElement = document.getElementById('params');
+            const statusElement = document.getElementById('status');
+            
+            // Display all URL parameters
+            paramsElement.innerHTML = '<h3>URL Parameters:</h3>';
+            let hasParams = false;
+            
+            urlParams.forEach((value, key) => {
+                hasParams = true;
+                paramsElement.innerHTML += `<p><strong>${key}:</strong> ${value}</p>`;
+            });
+            
+            if (!hasParams) {
+                paramsElement.innerHTML += '<p>No parameters found in URL.</p>';
+            }
+            
+            // Check for authorization code or error
+            if (urlParams.has('code')) {
+                const code = urlParams.get('code');
+                const state = urlParams.get('state') || '';
+                
+                // Redirect back to your app with the code
+                window.location.href = `kick-app-auth://oauth/callback?code=${code}&state=${state}`;
+                
+                statusElement.innerHTML = '<p class="success">Authorization successful! Redirecting you back to the app...</p>';
+                console.log('OAuth success: Authorization code received, redirecting to app');
+            } else if (urlParams.has('error')) {
+                statusElement.innerHTML = `<p class="error">Authorization failed: ${urlParams.get('error')}</p>`;
+                if (urlParams.has('error_description')) {
+                    statusElement.innerHTML += `<p class="error">${urlParams.get('error_description')}</p>`;
+                }
+                console.log('OAuth error:', urlParams.get('error'));
+            } else {
+                statusElement.innerHTML = '<p class="error">Invalid callback: No authorization code or error found.</p>';
+                console.log('OAuth callback: No code or error parameter found');
+            }
+            
+            // Log to console for debugging
+            console.log('Full callback URL:', window.location.href);
+            console.log('All URL parameters:', Object.fromEntries(urlParams.entries()));
+        });
+    </script>
+</body>
+</html>
